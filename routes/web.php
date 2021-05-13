@@ -19,4 +19,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/home',[App\Http\Controllers\HomeController::class,'index']);
+//seguendo le linee guida restful api la risorsa sara'
+//Path : /photo/{photo} dove photo e' la risorsa
+//Route name : photo.show
+Route::get('/profile/{user}', [App\Http\Controllers\ProfilesController::class, 'index'])->name('profile.show');

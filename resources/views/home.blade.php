@@ -1,23 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
-
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="users">
+                <h5>Users</h5>
+                <ul class="list-group list-chat-item">
+                    @if($users->count())
+                        @foreach($users as $user)
+                            <li class="chat-user-list">
+                                <a href="">
+                                    <div class="chat-image">
+                                        {!! makeImageFromName($user->username) !!}
+                                    </div>
+                                    <div class="chat-name">
+                                        {{ $user->username }}
+                                    </div>
+                                </a>
+                            </li>
+                        @endforeach
                     @endif
-
-                    {{ __('You are logged in!') }}
-                </div>
+                </ul>
             </div>
         </div>
+        <div class="col-md-9">
+            <h1>
+                Sezione messaggi
+            </h1>
+            Seleziona la conversazione!
+        </div>
     </div>
-</div>
 @endsection
