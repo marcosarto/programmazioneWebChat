@@ -21,6 +21,7 @@ Auth::routes();
 
 
 Route::get('/home',[App\Http\Controllers\HomeController::class,'index']);
+Route::get('conversation/{userId}',[App\Http\Controllers\MessageController::class,'conversation'])->name('message.conversation');
 //seguendo le linee guida restful api la risorsa sara'
 //Path : /photo/{photo} dove photo e' la risorsa
 //Route name : photo.show

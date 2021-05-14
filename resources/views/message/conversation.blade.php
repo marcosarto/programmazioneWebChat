@@ -8,8 +8,8 @@
                 <ul class="list-group list-chat-item">
                     @if($users->count())
                         @foreach($users as $user)
-                            <li class="chat-user-list">
-                                <a href="{{route('message.conversation',$user->id)}}">
+                            <li class="chat-user-list @if($user->id == $friendInfo->id) active @endif">
+                                <a href="">
                                     <div class="chat-image">
                                         {!! makeImageFromName($user->username) !!}
                                         <i class="fa fa-circle user-status-icon" title="away">
@@ -27,10 +27,7 @@
             </div>
         </div>
         <div class="col-md-9">
-            <h1>
-                Sezione messaggi
-            </h1>
-            Seleziona la conversazione!
+            Corpo conversazione
         </div>
     </div>
 @endsection

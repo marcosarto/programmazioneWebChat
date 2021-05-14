@@ -1,3 +1,7 @@
+body{
+    font-size: 18px;
+}
+
 .chat-row{
     margin:50px;
 }
@@ -7,13 +11,14 @@
 }
 
 .name-image{
-    width:35px;
-    height:35px;
+    width:40px;
+    height:40px;
     color: #ffffff;
     border-radius: 50%;
     font-weight: bold;
-    padding: 5px;
+    padding-top: 5px;
     display: inline-block;
+    text-align: center;
 }
 
 .chat-image, .chat-name{
@@ -21,11 +26,22 @@
 }
 
 .chat-user-list{
-    margin-bottom: 10px;
+    margin-bottom: 2px;
     padding: 5px;
-    height: 45px;
+    height: 50px;
 }
 
 .chat-user-list.active{
     background: #e4e4e4;
+}
+
+.user-status-icon {
+    position: absolute;
+    top: 22px;
+    left: 28px;
+    color: grey;
+}
+
+.chat-image{
+    position: relative;
 }

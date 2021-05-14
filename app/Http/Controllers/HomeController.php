@@ -25,8 +25,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        #$users = User::where('id', '!=', Auth::id())->get();
-        $users = User::all();
+        $users = User::where('id', '!=', Auth::id())->get(); #Elenca tutti gli utenti tranne tu che sei acceduto
         $this->data['users'] = $users;
         return view('home', $this->data);
     }
