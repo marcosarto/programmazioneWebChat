@@ -1,0 +1,2 @@
+php artisan serve
+sudo /opt/lampp/lampp startmysql

@@ -14,16 +14,15 @@
                 <ul class="list-group list-chat-item">
                     @if($users->count())
                         @foreach($users as $user)
-                            <li class="chat-user-list
-                                @if($user->id == $friendInfo->id) active @endif">
+                            <li class="chat-user-list">
                                 <a href="{{ route('message.conversation', $user->id) }}">
                                     <div class="chat-image">
-                                        {!! makeImageFromName($user->username) !!}
+                                        {!! makeImageFromName($user->name) !!}
                                         <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}" title="away"></i>
                                     </div>
 
                                     <div class="chat-name font-weight-bold">
-                                        {{ $user->username }}
+                                        {{ $user->name }}
                                     </div>
                                 </a>
                             </li>
@@ -50,16 +49,10 @@
 
         </div>
 
-        <div class="col-md-9 chat-section">
+        <div class="col-md-6 chat-section">
             <div class="chat-header">
                 <div class="chat-image">
-                    {!! makeImageFromName($user->username) !!}
-                </div>
-
-                <div class="chat-name font-weight-bold">
-                    {{ $user->username }}
-                    <i class="fa fa-circle user-status-head" title="away"
-                       id="userStatusHead{{$friendInfo->id}}"></i>
+                    {{ $currentGroup->name }}
                 </div>
             </div>
 
@@ -91,6 +84,22 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <h4>{{ $currentGroup->name }}</h4>
+            @if(isset($currentGroup->message_group_members) && !empty($currentGroup->message_group_members))
+                <ul class="list-group">
+                    @foreach($currentGroup->message_group_members as $member)
+                        @if(isset($member->user))
+                            <li class="list-group-item">
+                                {!! makeImageFromName($member->user->name) !!}
+                                {{ $member->user->name }}
+                            </li>
+                        @endif
+                    @endforeach
+                </ul>
+            @endif
+        </div>
     </div>
 
     <div class="modal" tabindex="-1" role="dialog" id="addGroupModal">
@@ -115,7 +124,7 @@
                             <select id="selectMember" class="form-control" name="user_id[]" id="" multiple="multiple">
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">
-                                        {{ $user->username }}
+                                        {{ $user->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -146,10 +155,13 @@
             let ip_address = '127.0.0.1';
             let socket_port = '8005';
             let socket = io(ip_address + ':' + socket_port);
-            let friendId = "{{ $friendInfo->id }}";
+            let groupId = "{!! $currentGroup->id !!}";
+            let groupName = "{!! $currentGroup->name !!}";
 
             socket.on('connect', function() {
+                let data = {group_id:groupId, user_id:user_id, room:"group"+groupId};
                 socket.emit('user_connected', user_id);
+                socket.emit('joinGroup', data);
             });
 
             socket.on('updateUserStatus', (data) => {
@@ -176,14 +188,14 @@
             });
 
             function sendMessage(message) {
-                let url = "{{ route('message.send-message') }}";
+                let url = "{{ route('message.send-group-message') }}";
                 let form = $(this);
                 let formData = new FormData();
                 let token = "{{ csrf_token() }}";
 
                 formData.append('message', message);
                 formData.append('_token', token);
-                formData.append('receiver_id', friendId);
+                formData.append('message_group_id', groupId);
 
                 appendMessageToSender(message);
 
@@ -203,8 +215,8 @@
             }
 
             function appendMessageToSender(message) {
-                let name = '{{ $myInfo->username }}';
-                let image = '{!! makeImageFromName($myInfo->username) !!}';
+                let name = '{{ $myInfo->name }}';
+                let image = '{!! makeImageFromName($myInfo->name) !!}';
 
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
@@ -231,8 +243,8 @@
             }
 
             function appendMessageToReceiver(message) {
-                let name = '{{ $friendInfo->username }}';
-                let image = '{!! makeImageFromName($friendInfo->username) !!}';
+                let name = message.sender_name;
+                let image = '';
 
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
@@ -269,6 +281,11 @@
             });
 
             $("#selectMember").select2();
+
+            socket.on("groupMessage", function (message)
+            {
+                appendMessageToReceiver(message);
+            });
         });
     </script>
 @endpush

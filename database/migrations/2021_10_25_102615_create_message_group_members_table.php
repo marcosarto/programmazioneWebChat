@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProfilesTable extends Migration
+class CreateMessageGroupMembersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,12 @@ class CreateProfilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('profiles', function (Blueprint $table) {
+        Schema::create('message_group_members', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('bio')->default('');
-            $table->dateTime('lastOnline')->nullable();
-            $table->date('joined')->nullable();
-
+            $table->unsignedInteger('message_group_id');
+            $table->unsignedInteger('user_id');
+            $table->integer('status');
             $table->timestamps();
-
-            $table->index('user_id');
         });
     }
 
@@ -33,6 +29,6 @@ class CreateProfilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('message_group_members');
     }
 }
