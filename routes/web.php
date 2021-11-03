@@ -25,13 +25,18 @@ Route::get('conversation/{userId}',[App\Http\Controllers\MessageController::clas
     ->name('message.conversation');
 //seguendo le linee guida restful api la risorsa sara'
 //Path : /photo/{photo} dove photo e' la risorsa
-//Route name : photo.show
+//Route name : photo.show2
 
-Route::get('profile/{userId}', [App\Http\Controllers\ProfilesController::class, 'profile']);
-Route::get('edit_profile/{userId}',[App\Http\Controllers\ProfilesController::class, 'edit_profile']);
+Route::get('profile/{userId}', [App\Http\Controllers\ProfilesController::class, 'profile'])->name('profile.show');
+Route::get('edit/{id}',[App\Http\Controllers\ProfilesController::class, 'edit']);
+Route::get('delete/{id}',[App\Http\Controllers\ProfilesController::class, 'delete']);
+Route::post('edit',[App\Http\Controllers\ProfilesController::class, 'update']);
+
 Route::post('send-message','App\Http\Controllers\MessageController@sendMessage')
     ->name('message.send-message');
 Route::post('send-group-message','App\Http\Controllers\MessageController@sendGroupMessage')
     ->name('message.send-group-message');
+
+
 
 Route::resource('message-groups', 'App\Http\Controllers\MessageGroupController');

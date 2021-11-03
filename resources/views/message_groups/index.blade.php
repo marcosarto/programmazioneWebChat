@@ -17,12 +17,12 @@
                             <li class="chat-user-list">
                                 <a href="{{ route('message.conversation', $user->id) }}">
                                     <div class="chat-image">
-                                        {!! makeImageFromName($user->name) !!}
+                                        {!! makeImageFromName($user->username) !!}
                                         <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}" title="away"></i>
                                     </div>
 
                                     <div class="chat-name font-weight-bold">
-                                        {{ $user->name }}
+                                        {{ $user->username }}
                                     </div>
                                 </a>
                             </li>
@@ -92,8 +92,8 @@
                     @foreach($currentGroup->message_group_members as $member)
                         @if(isset($member->user))
                             <li class="list-group-item">
-                                {!! makeImageFromName($member->user->name) !!}
-                                {{ $member->user->name }}
+                                {!! makeImageFromName($member->user->username) !!}
+                                {{ $member->user->username }}
                             </li>
                         @endif
                     @endforeach
@@ -215,8 +215,8 @@
             }
 
             function appendMessageToSender(message) {
-                let name = '{{ $myInfo->name }}';
-                let image = '{!! makeImageFromName($myInfo->name) !!}';
+                let name = '{{ $myInfo->username }}';
+                let image = '{!! makeImageFromName($myInfo->username) !!}';
 
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +

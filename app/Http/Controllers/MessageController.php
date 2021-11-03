@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\GroupMessageEvent;
 use App\Models\Message;
 use App\Models\MessageGroup;
+use App\Models\MessageGroupMember;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,24 @@ class MessageController extends Controller
         $users = User::where('id', '!=', Auth::id())->get();
         $friendInfo = User::findOrFail($userId);
         $myInfo = User::find(Auth::id());
-        $groups = MessageGroup::get();
+        $groupsAll = MessageGroup::get();
+        $groups = array();
+        $membersAll = MessageGroupMember::all();
+        $members = array();
+
+        foreach($membersAll as $m){
+            if($m->user_id==Auth::id())
+                array_push($members,$m);
+        }
+
+        foreach($groupsAll as $g){
+            foreach($members as $m){
+                if($g->id == $m->message_group_id)
+                    array_push($groups,$g);
+            }
+            if ($g->user_id==Auth::id())
+                array_push($groups,$g);
+        }
 
         $this->data['users'] = $users;
         $this->data['friendInfo'] = $friendInfo;

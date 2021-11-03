@@ -50,7 +50,7 @@
 
         </div>
 
-        <div class="col-md-9 chat-section">
+        <div class="col-md-6 chat-section">
             <div class="chat-header">
                 <div class="chat-image">
                     {!! makeImageFromName($friendInfo->username) !!}
@@ -58,8 +58,8 @@
 
                 <a href="{{ route('profile.show', $friendInfo->id) }}"><div class="chat-name font-weight-bold">
                         {{ $friendInfo->username }}
-                    <i class="fa fa-circle user-status-head" title="away"
-                       id="userStatusHead{{$friendInfo->id}}"></i>
+                        <i class="fa fa-circle user-status-head" title="away"
+                           id="userStatusHead{{$friendInfo->id}}"></i>
                     </div></a>
             </div>
 
@@ -88,6 +88,30 @@
                             onclick="document.execCommand('italic', false, '');">
                         <i class="fa fa-italic tool-icon"></i>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
+                <div class="card p-4">
+                    <div class=" image d-flex flex-column justify-content-center align-items-center"> <button class="btn btn-secondary"> <div class="chat-image">
+                                {!! makeImageFromNameProfile($name) !!}
+                            </div></button>
+                        <span class="name mt-3">{{ $name }}</span>
+                        <div class="d-flex flex-row justify-content-center align-items-center mt-3"> <span class="number">1069 <span class="follow">Followers</span></span> </div>
+                        @if($userId==\Illuminate\Support\Facades\Auth::id() or \Illuminate\Support\Facades\Auth::id()==1)
+                            <div class=" d-flex mt-2"> <a href="{{url("/edit/{$userId}")}};" ><button class="btn1 btn-dark">Edit Profile</button></a>
+                            </div>
+                        @endif
+                        @if(\Illuminate\Support\Facades\Auth::id()==1)
+                            <div class=" d-flex mt-2"> <a href="{{url("/delete/{$userId}")}};" ><button class="btn1 btn-red">Delete Profile</button></a>
+                            </div>
+                        @endif
+                        <div class="text mt-3"> <span> {{ $bio }} </span> </div>
+                        <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center"> <span><i class="fa fa-twitter"></i></span> <span><i class="fa fa-facebook-f"></i></span> <span><i class="fa fa-instagram"></i></span> <span><i class="fa fa-linkedin"></i></span> </div>
+                        <div class=" px-2 rounded mt-4 date "> <span class="join">Joined May,2021</span> </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,6 +157,7 @@
 @endsection
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" />
+<link rel="stylesheet" href=https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css>
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
     <script>

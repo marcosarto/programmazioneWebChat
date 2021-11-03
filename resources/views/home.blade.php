@@ -25,6 +25,22 @@
                     @endif
                 </ul>
             </div>
+
+            <div class="groups mt-5">
+                <h5>Groups <i class="fa fa-plus btn-add-group ml-3"></i></h5>
+
+                <ul class="list-group list-chat-item">
+                    @if(count($groups))
+                        @foreach($groups as $group)
+                            <li class="chat-user-list">
+                                <a href="{{ route('message-groups.show', $group->id) }}">
+                                    {{ $group->name }}
+                                </a>
+                            </li>
+                        @endforeach
+                    @endif
+                </ul>
+            </div>
         </div>
         <div class="col-md-9">
             <h1>
