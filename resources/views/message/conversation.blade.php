@@ -326,6 +326,7 @@
             function appendMessageToReceiver(message) {
                 let name = '{{ $friendInfo->username }}';
                 let image = '{!! makeImageFromName($friendInfo->username) !!}';
+                let testo;
 
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
@@ -338,8 +339,14 @@
                     '</div>\n' +
                     '</div>\n';
 
+                if (typeof message.message === "undefined") {
+                    testo = message;
+                } else {
+                    testo = message.message;
+                }
+
                 let messageContent = '<div class="col-md-12 message-content">\n' +
-                    '                            <div class="message-text">\n' + message.content +
+                    '                            <div class="message-text">\n' + testo +
                     '                            </div>\n' +
                     '                        </div>';
 
