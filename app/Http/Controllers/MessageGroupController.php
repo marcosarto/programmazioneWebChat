@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MessageGroup;
 use App\Models\MessageGroupMember;
 use App\Models\User;
+use App\Models\UserMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,10 +74,18 @@ class MessageGroupController extends Controller
             ->with('message_group_members.user')
             ->first();
 
+        $notRead = array();
+
+        foreach ($users as $u){
+            $n = UserMessage::where('receiver_id','=',Auth::id(),'and')->where('sender_id','=',$u->id)->where('seen_status','=',0)->get();
+            $notRead[$u->id] = count($n);
+        }
+
         $this->data['users'] = $users;
         $this->data['myInfo'] = $myInfo;
         $this->data['groups'] = $groups;
         $this->data['currentGroup'] = $currentGroup;
+        $this->data['notRead']= $notRead;
 
         return view('message_groups.index', $this->data);
     }

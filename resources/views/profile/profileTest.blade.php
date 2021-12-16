@@ -7,7 +7,7 @@
 </style>
 @section('content')
     <div class="row chat-row">
-        <div class="col-md-3">
+        <div class="col-md-3 scrollable">
             <div class="users">
                 <h5>Users</h5>
 
@@ -23,7 +23,7 @@
                                     </div>
 
                                     <div class="chat-name font-weight-bold">
-                                        {{ $user->username }}
+                                        {{ $user->username }} ({{ $notRead[$user->id] }})
                                     </div>
                                 </a>
                             </li>
@@ -173,6 +173,25 @@
             let socket_port = '8005';
             let socket = io(ip_address + ':' + socket_port);
             let friendId = "{{ $friendInfo->id }}";
+            var msgs = <?php
+                echo \App\Models\UserMessage::all();?>;
+            var texts = <?php
+                echo \App\Models\Message::all();?>;
+
+            for(const m of msgs){
+                if(m['sender_id']==user_id && m['receiver_id']==friendId){
+                    for(const t of texts){
+                        if(t['id']==m['message_id'])
+                            appendMessageToSender(t['message']);
+                    }
+                }
+                if(m['sender_id']==friendId && m['receiver_id']==user_id){
+                    for(const t of texts){
+                        if(t['id']==m['message_id'])
+                            appendMessageToReceiver(t['message']);
+                    }
+                }
+            }
 
             socket.on('connect', function() {
                 socket.emit('user_connected', user_id);

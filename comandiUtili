@@ -1,2 +1,7 @@
 php artisan serve
 sudo /opt/lampp/lampp startmysql
+node server.js
+sudo systemctl start redis
+sudo systemctl status redis
+php artisan queue:restart
+php artisan queue:work

@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\MessageGroupMember;
 use App\Models\User;
+use App\Models\UserMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\PrivateMessageEvent;
@@ -21,6 +22,12 @@ class MessageController extends Controller
         $groups = array();
         $membersAll = MessageGroupMember::all();
         $members = array();
+        $notRead = array();
+
+        foreach ($users as $u){
+            $n = UserMessage::where('receiver_id','=',Auth::id(),'and')->where('sender_id','=',$u->id)->where('seen_status','=',0)->get();
+            $notRead[$u->id] = count($n);
+        }
 
         foreach($membersAll as $m){
             if($m->user_id==Auth::id())
@@ -41,6 +48,7 @@ class MessageController extends Controller
         $this->data['myInfo'] = $myInfo;
         $this->data['users'] = $users;
         $this->data['groups'] = $groups;
+        $this->data['notRead']= $notRead;
 
         return view('message.conversation', $this->data);
     }
@@ -121,4 +129,27 @@ class MessageController extends Controller
             }
         }
     }
+
+    public function readMessage(Request $request) {
+//        $request->validate([
+//            'message' => 'required',
+//            'receiver_id' => 'required'
+//        ]);
+
+        $sender_id = Auth::id();
+        $receiver_id = $request->receiver_id;
+
+        $message = UserMessage::where('message_id','=',$request->messageId)->first();
+        $message->seen_status=1;
+        $myfile = fopen("testfile.txt", "w");
+        fwrite($myfile, $message);
+        $message->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message sent successfully'
+        ]);
+    }
 }
+
+

@@ -31,3 +31,33 @@ function makeImageFromNameProfile($name) {
     #venga ricavata l'immagine rotonda e' rimandata al file CSS contenente la classe del div.
     return $userImage;
 }
+
+function makeImageFromNameGroup($name) {
+    $userImage = "";
+    $abbreviazione = "";
+
+    $names = explode(" ", $name);
+
+    foreach ($names as $t){
+        $abbreviazione .= $t[0];
+    }
+
+    $userImage = '<div class="name-image bg-secondary">'.$abbreviazione.'</div>'; #Spiegazione di come prese le due iniziali
+    #venga ricavata l'immagine rotonda e' rimandata al file CSS contenente la classe del div.
+    return $userImage;
+}
+
+function makeImageFromNameProfileGroup($name) {
+    $userImage = "";
+    $abbreviazione = "";
+
+    $names = explode(" ", $name);
+
+    foreach ($names as $t){
+        $abbreviazione .= $t[0];
+    }
+
+    $userImage = '<div class="name-image-profile bg-secondary">'.$abbreviazione.'</div>'; #Spiegazione di come prese le due iniziali
+    #venga ricavata l'immagine rotonda e' rimandata al file CSS contenente la classe del div.
+    return $userImage;
+}

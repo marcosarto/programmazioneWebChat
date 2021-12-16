@@ -13,8 +13,8 @@ class AddColumnsToUserMessagesTable extends Migration
      */
     public function up()
     {
-        Schema::table('user_messages', function (Blueprint $table) {
-           $table->unsignedInteger('message_group_id')->nullable();
+        Schema::table('messages', function (Blueprint $table) {
+            $table->dateTime('time');
         });
     }
 

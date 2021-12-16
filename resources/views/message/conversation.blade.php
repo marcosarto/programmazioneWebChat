@@ -7,10 +7,11 @@
 </style>
 @section('content')
     <div class="row chat-row">
-        <div class="col-md-3">
+        <?php $text = 'Insert message here'; ?>
+        <div class="col-md-3 scrollable">
             <div class="users">
-                <h5>Users</h5>
-
+                <h4 style="text-align: center">Users</h4>
+                <br>
                 <ul class="list-group list-chat-item">
                     @if($users->count())
                         @foreach($users as $user)
@@ -19,11 +20,12 @@
                                 <a href="{{ route('message.conversation', $user->id) }}">
                                     <div class="chat-image">
                                         {!! makeImageFromName($user->username) !!}
-                                        <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}" title="away"></i>
+                                        <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}"
+                                           title="away"></i>
                                     </div>
 
                                     <div class="chat-name font-weight-bold">
-                                        {{ $user->username }}
+                                        {{ $user->username }} ({{ $notRead[$user->id] }})
                                     </div>
                                 </a>
                             </li>
@@ -31,16 +33,23 @@
                     @endif
                 </ul>
             </div>
-
+            <br>
+            <hr style="height:1px;border-width:0;color:black;background-color:black">
             <div class="groups mt-5">
-                <h5>Groups <i class="fa fa-plus btn-add-group ml-3"></i></h5>
-
+                <h4 style="text-align: center">Groups<i class="fa fa-plus btn-add-group ml-3 text-danger"></i></h4>
+                <br>
                 <ul class="list-group list-chat-item">
                     @if(count($groups))
                         @foreach($groups as $group)
                             <li class="chat-user-list">
                                 <a href="{{ route('message-groups.show', $group->id) }}">
-                                    {{ $group->name }}
+                                    <div class="chat-image">
+                                        {!! makeImageFromNameGroup($group->name) !!}
+                                    </div>
+
+                                    <div class="chat-name font-weight-bold">
+                                        {{ $group->name }}
+                                    </div>
                                 </a>
                             </li>
                         @endforeach
@@ -56,11 +65,11 @@
                     {!! makeImageFromName($friendInfo->username) !!}
                 </div>
 
-                <a href="{{ route('profile.show', $friendInfo->id) }}"><div class="chat-name font-weight-bold">
-                        {{ $friendInfo->username }}
-                    <i class="fa fa-circle user-status-head" title="away"
-                       id="userStatusHead{{$friendInfo->id}}"></i>
-                    </div></a>
+                <div class="chat-name font-weight-bold">
+                    <a href="{{ route('profile.show', $friendInfo->id) }}">{{ $friendInfo->username }}</a>
+                    {{--                    <i class="fa fa-circle user-status-head" title="away"--}}
+                    {{--                       id="userStatusHead{{$friendInfo->id}}"></i>--}}
+                </div>
             </div>
 
             <div class="chat-body" id="chatBody">
@@ -70,14 +79,15 @@
             </div>
 
             <div class="chat-box">
-                <div class="chat-input bg-white" id="chatInput" contenteditable="">
-
+                <div class="chat-input bg-white" id="chatInput" contenteditable="" onclick="remove(this)">
+                    Insert message
                 </div>
 
                 <div class="chat-input-toolbar">
                     <button title="Add File" class="btn btn-light btn-sm btn-file-upload">
                         <i class="fa fa-paperclip"></i>
-                    </button> |
+                    </button>
+                    |
 
                     <button title="Bold" class="btn btn-light btn-sm tool-items"
                             onclick="document.execCommand('bold', false, '');">
@@ -88,6 +98,11 @@
                             onclick="document.execCommand('italic', false, '');">
                         <i class="fa fa-italic tool-icon"></i>
                     </button>
+
+                    <button class="btn btn-light btn-sm sendWithButton border-dark float-right" onclick="this.blur();">
+                        &#8626;
+                    </button>
+
                 </div>
             </div>
         </div>
@@ -123,7 +138,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary">Create group</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -132,24 +147,77 @@
     </div>
 @endsection
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+      integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw=="
+      crossorigin="anonymous"/>
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+            integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+            crossorigin="anonymous"></script>
     <script>
-        $(function (){
+        function remove(el) {
+            var t = el.textContent;
+            var element = el;
+            if (t.includes("Insert message"))
+                element.innerHTML = '';
+        }
+
+        $(function () {
             let $chatInput = $(".chat-input");
             let $chatInputToolbar = $(".chat-input-toolbar");
             let $chatBody = $(".chat-body");
             let $messageWrapper = $("#messageWrapper");
-
+            var lastMsg = -1;
 
             let user_id = "{{ auth()->user()->id }}";
             let ip_address = '127.0.0.1';
             let socket_port = '8005';
             let socket = io(ip_address + ':' + socket_port);
             let friendId = "{{ $friendInfo->id }}";
+            var msgs = <?php
+                echo \App\Models\UserMessage::all();?>;
+            var texts = <?php
+                echo \App\Models\Message::all();?>;
 
-            socket.on('connect', function() {
+            for (const m of msgs) {
+                if (m['sender_id'] == user_id && m['receiver_id'] == friendId) {
+                    for (const t of texts) {
+                        if (t['id'] == m['message_id'])
+                            appendMessageToSender(t);
+                    }
+                }
+                if (m['sender_id'] == friendId && m['receiver_id'] == user_id) {
+
+                    if (m['seen_status'] == 0) {
+                        let url = "{{ route('message.read-message') }}";
+                        let form = $(this);
+                        let formData = new FormData();
+                        let token = "{{ csrf_token() }}";
+
+                        formData.append('messageId', m.message_id);
+                        formData.append('_token', token);
+                        //formData.append('receiver_id', friendId);
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            dataType: 'JSON',
+                            success: function (response) {
+                                location.reload();
+                            }
+                        });
+                    }
+
+                    for (const t of texts) {
+                        if (t['id'] == m['message_id'])
+                            appendMessageToReceiver(t);
+                    }
+                }
+            }
+
+            socket.on('connect', function () {
                 socket.emit('user_connected', user_id);
             });
 
@@ -160,12 +228,13 @@
 
                 $.each(data, function (key, val) {
                     if (val !== null && val !== 0) {
-                        let $userIcon = $(".user-icon-"+key);
+                        let $userIcon = $(".user-icon-" + key);
                         $userIcon.addClass('text-success');
-                        $userIcon.attr('title','Online');
+                        $userIcon.attr('title', 'Online');
                     }
                 });
             });
+
 
             $chatInput.keypress(function (e) {
                 let message = $(this).html();
@@ -207,28 +276,51 @@
                 let name = '{{ $myInfo->username }}';
                 let image = '{!! makeImageFromName($myInfo->username) !!}';
 
+                let testo;
+                let data;
+                let time;
+                if (typeof message.created_at === "undefined") {
+                    data = getCurrentDateTime();
+                    time = getCurrentTime();
+                } else {
+                    data = dateFormat(message.created_at);
+                    time = timeFormat(message.created_at);
+                }
+
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
                     '</div>\n' +
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="'+getCurrentDateTime()+'">\n' +
-                    getCurrentTime()+'</span>\n' +
+                    '<span class="small time text-gray-500" title="' + data + '">\n' +
+                    time + '</span>\n' +
                     '</div>\n' +
                     '</div>\n';
 
+                if (typeof message.message === "undefined") {
+                    testo = message;
+                } else {
+                    testo = message.message;
+                }
+
                 let messageContent = '<div class="col-md-12 message-content">\n' +
-                    '                            <div class="message-text">\n' + message +
+                    '                            <div class="message-text">\n' + testo +
                     '                            </div>\n' +
                     '                        </div>';
 
 
-                let newMessage = '<div class="row message align-items-center mb-2">'
-                    +userInfo + messageContent +
+                let newMessage = '<div class="row message mb-2">'
+                    + userInfo + messageContent +
                     '</div>';
-
-                $messageWrapper.append(newMessage);
+                let newMessageAppended = '<div class="row message mb-2">'
+                    + messageContent +
+                    '</div>';
+                if (lastMsg === -1 || lastMsg === 1)
+                    $messageWrapper.append(newMessage);
+                else
+                    $messageWrapper.append(newMessageAppended);
+                lastMsg = 0;
             }
 
             function appendMessageToReceiver(message) {
@@ -241,8 +333,8 @@
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="'+dateFormat(message.created_at)+'">\n' +
-                    timeFormat(message.created_at)+'</span>\n' +
+                    '<span class="small time text-gray-500" title="' + dateFormat(message.created_at) + '">\n' +
+                    timeFormat(message.created_at) + '</span>\n' +
                     '</div>\n' +
                     '</div>\n';
 
@@ -253,23 +345,61 @@
 
 
                 let newMessage = '<div class="row message align-items-center mb-2">'
-                    +userInfo + messageContent +
+                    + userInfo + messageContent +
                     '</div>';
 
-                $messageWrapper.append(newMessage);
+                let newMessageAppended = '<div class="row message align-items-center mb-2">'
+                    + messageContent +
+                    '</div>';
+
+                if (lastMsg === -1 || lastMsg === 0)
+                    $messageWrapper.append(newMessage);
+                else
+                    $messageWrapper.append(newMessageAppended);
+                lastMsg = 1;
             }
 
-            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message)
-            {
-                appendMessageToReceiver(message);
+            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message) {
+                if (friendId == message.sender_id) {
+                    let url = "{{ route('message.read-message') }}";
+                    let form = $(this);
+                    let formData = new FormData();
+                    let token = "{{ csrf_token() }}";
+
+                    formData.append('messageId', message.message_id);
+                    formData.append('_token', token);
+                    //formData.append('receiver_id', friendId);
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'JSON',
+                        success: function (response) {
+                        }
+                    });
+                    appendMessageToReceiver(message);
+                } else {
+                    location.reload();
+                }
+            });
+
+            $(document).on("click", ".sendWithButton", function () {
+                el = document.getElementById("chatInput");
+                message = el.textContent;
+                sendMessage(message);
+                el.innerHTML='';
             });
 
             let $addGroupModal = $("#addGroupModal");
-            $(document).on("click", ".btn-add-group", function (){
+            $(document).on("click", ".btn-add-group", function () {
+                console.log('ciao');
                 $addGroupModal.modal();
             });
 
             $("#selectMember").select2();
         });
+
     </script>
 @endpush

@@ -7,9 +7,10 @@
 </style>
 @section('content')
     <div class="row chat-row">
-        <div class="col-md-3">
+        <div class="col-md-3 scrollable">
             <div class="users">
-                <h5>Users</h5>
+                <h4 style="text-align: center">Users</h4>
+                <br>
 
                 <ul class="list-group list-chat-item">
                     @if($users->count())
@@ -18,11 +19,12 @@
                                 <a href="{{ route('message.conversation', $user->id) }}">
                                     <div class="chat-image">
                                         {!! makeImageFromName($user->username) !!}
-                                        <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}" title="away"></i>
+                                        <i class="fa fa-circle user-status-icon user-icon-{{ $user->id }}"
+                                           title="away"></i>
                                     </div>
 
                                     <div class="chat-name font-weight-bold">
-                                        {{ $user->username }}
+                                        {{ $user->username }} ({{ $notRead[$user->id] }})
                                     </div>
                                 </a>
                             </li>
@@ -30,16 +32,23 @@
                     @endif
                 </ul>
             </div>
-
+            <br>
+            <hr style="height:1px;border-width:0;color:black;background-color:black">
             <div class="groups mt-5">
-                <h5>Groups <i class="fa fa-plus btn-add-group ml-3"></i></h5>
-
+                <h4 style="text-align: center">Groups<i class="fa fa-plus btn-add-group ml-3 text-danger"></i></h4>
+                <br>
                 <ul class="list-group list-chat-item">
-                    @if($groups->count())
+                    @if(count($groups))
                         @foreach($groups as $group)
                             <li class="chat-user-list">
                                 <a href="{{ route('message-groups.show', $group->id) }}">
-                                    {{ $group->name }}
+                                    <div class="chat-image">
+                                        {!! makeImageFromNameGroup($group->name) !!}
+                                    </div>
+
+                                    <div class="chat-name font-weight-bold">
+                                        {{ $group->name }}
+                                    </div>
                                 </a>
                             </li>
                         @endforeach
@@ -70,7 +79,8 @@
                 <div class="chat-input-toolbar">
                     <button title="Add File" class="btn btn-light btn-sm btn-file-upload">
                         <i class="fa fa-paperclip"></i>
-                    </button> |
+                    </button>
+                    |
 
                     <button title="Bold" class="btn btn-light btn-sm tool-items"
                             onclick="document.execCommand('bold', false, '');">
@@ -124,14 +134,14 @@
                             <select id="selectMember" class="form-control" name="user_id[]" id="" multiple="multiple">
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}">
-                                        {{ $user->name }}
+                                        {{ $user->username }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary">Create group</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -140,26 +150,24 @@
     </div>
 @endsection
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+      integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw=="
+      crossorigin="anonymous"/>
+
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+            integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+            crossorigin="anonymous"></script>
     <script>
-        $(function (){
+        $(function () {
             let $chatInput = $(".chat-input");
             let $chatInputToolbar = $(".chat-input-toolbar");
             let $chatBody = $(".chat-body");
             let $messageWrapper = $("#messageWrapper");
 
 
-            let user_id = "{{ auth()->user()->id }}";
-            let ip_address = '127.0.0.1';
-            let socket_port = '8005';
-            let socket = io(ip_address + ':' + socket_port);
-            let groupId = "{!! $currentGroup->id !!}";
-            let groupName = "{!! $currentGroup->name !!}";
-
-            socket.on('connect', function() {
-                let data = {group_id:groupId, user_id:user_id, room:"group"+groupId};
+            socket.on('connect', function () {
+                let data = {group_id: groupId, user_id: user_id, room: "group" + groupId};
                 socket.emit('user_connected', user_id);
                 socket.emit('joinGroup', data);
             });
@@ -171,9 +179,9 @@
 
                 $.each(data, function (key, val) {
                     if (val !== null && val !== 0) {
-                        let $userIcon = $(".user-icon-"+key);
+                        let $userIcon = $(".user-icon-" + key);
                         $userIcon.addClass('text-success');
-                        $userIcon.attr('title','Online');
+                        $userIcon.attr('title', 'Online');
                     }
                 });
             });
@@ -224,8 +232,8 @@
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="'+getCurrentDateTime()+'">\n' +
-                    getCurrentTime()+'</span>\n' +
+                    '<span class="small time text-gray-500" title="' + getCurrentDateTime() + '">\n' +
+                    getCurrentTime() + '</span>\n' +
                     '</div>\n' +
                     '</div>\n';
 
@@ -236,7 +244,7 @@
 
 
                 let newMessage = '<div class="row message align-items-center mb-2">'
-                    +userInfo + messageContent +
+                    + userInfo + messageContent +
                     '</div>';
 
                 $messageWrapper.append(newMessage);
@@ -252,8 +260,8 @@
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="'+dateFormat(message.created_at)+'">\n' +
-                    timeFormat(message.created_at)+'</span>\n' +
+                    '<span class="small time text-gray-500" title="' + dateFormat(message.created_at) + '">\n' +
+                    timeFormat(message.created_at) + '</span>\n' +
                     '</div>\n' +
                     '</div>\n';
 
@@ -264,28 +272,31 @@
 
 
                 let newMessage = '<div class="row message align-items-center mb-2">'
-                    +userInfo + messageContent +
+                    + userInfo + messageContent +
                     '</div>';
 
                 $messageWrapper.append(newMessage);
             }
 
-            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message)
-            {
+            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message) {
                 appendMessageToReceiver(message);
             });
 
+            socket.on("groupMessage", function (message) {
+                appendMessageToReceiver(message);
+            });
+
+            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message) {
+                location.reload();
+            });
+
             let $addGroupModal = $("#addGroupModal");
-            $(document).on("click", ".btn-add-group", function (){
+            $(document).on("click", ".btn-add-group", function () {
+                console.log('ciao');
                 $addGroupModal.modal();
             });
 
             $("#selectMember").select2();
-
-            socket.on("groupMessage", function (message)
-            {
-                appendMessageToReceiver(message);
-            });
         });
     </script>
 @endpush

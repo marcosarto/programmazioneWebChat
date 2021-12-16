@@ -1,5 +1,6 @@
 function getCurrentTime() {
-    return moment().format('h:mm A');
+    return moment().subtract('h', 1).format('h:mm A');
+    //moment().format('h:mm A');
 }
 
 function getCurrentDateTime() {
