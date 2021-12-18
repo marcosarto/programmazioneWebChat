@@ -6,7 +6,6 @@
                         {!! makeImageFromNameProfile($name) !!}
                     </div></button>
                 <span class="name mt-3">{{ $name }}</span>
-                <div class="d-flex flex-row justify-content-center align-items-center mt-3"> <span class="number">1069 <span class="follow">Followers</span></span> </div>
                 @if($userId==\Illuminate\Support\Facades\Auth::id() or \Illuminate\Support\Facades\Auth::id()==1)
                     <div class=" d-flex mt-2"> <a href="{{url("/edit/{$userId}")}};" ><button class="btn1 btn-dark">Edit Profile</button></a>
                     </div>
@@ -16,8 +15,7 @@
                     </div>
                 @endif
                 <div class="text mt-3"> <span> {{ $bio }} </span> </div>
-                <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center"> <span><i class="fa fa-twitter"></i></span> <span><i class="fa fa-facebook-f"></i></span> <span><i class="fa fa-instagram"></i></span> <span><i class="fa fa-linkedin"></i></span> </div>
-                <div class=" px-2 rounded mt-4 date "> <span class="join">Joined May,2021</span> </div>
+                <div class=" px-2 rounded mt-4 date "> <span class="join">{{ $joined }}</span> </div>
             </div>
         </div>
     </div>

@@ -63,6 +63,7 @@ class ProfilesController extends Controller
     {
         $this->data['userId'] = $userId;
         $this->data['name'] = User::findOrFail($userId)->username;
+        $this->data['joined'] = User::findOrFail($userId)->created_at->format('d/m/Y');
         $profile = Profile::where('user_id',$userId)->get();
         foreach($profile as $p)
             $this->data['bio'] = $p->bio;
