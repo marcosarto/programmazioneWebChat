@@ -155,37 +155,37 @@
       crossorigin="anonymous"/>
 
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
-            integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
-            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
     <script>
-        $(function () {
+        $(function (){
             let $chatInput = $(".chat-input");
             let $chatInputToolbar = $(".chat-input-toolbar");
             let $chatBody = $(".chat-body");
             let $messageWrapper = $("#messageWrapper");
-
-
-            socket.on('connect', function () {
-                let data = {group_id: groupId, user_id: user_id, room: "group" + groupId};
+            let user_id = "{{ auth()->user()->id }}";
+            let ip_address = '127.0.0.1';
+            let socket_port = '8005';
+            let socket = io(ip_address + ':' + socket_port);
+            let groupId = "{!! $currentGroup->id !!}";
+            let groupName = "{!! $currentGroup->name !!}";
+            socket.on('connect', function() {
+                let data = {group_id:groupId, user_id:user_id, room:"group"+groupId};
                 socket.emit('user_connected', user_id);
                 socket.emit('joinGroup', data);
             });
-
-            socket.on('updateUserStatus', (data) => {
-                let $userStatusIcon = $('.user-status-icon');
-                $userStatusIcon.removeClass('text-success');
-                $userStatusIcon.attr('title', 'Away');
-
-                $.each(data, function (key, val) {
-                    if (val !== null && val !== 0) {
-                        let $userIcon = $(".user-icon-" + key);
-                        $userIcon.addClass('text-success');
-                        $userIcon.attr('title', 'Online');
-                    }
-                });
-            });
-
+            // socket.on('updateUserStatus', (data) => {
+            //     let $userStatusIcon = $('.user-status-icon');
+            //     $userStatusIcon.removeClass('text-success');
+            //     $userStatusIcon.attr('title', 'Away');
+            //
+            //     $.each(data, function (key, val) {
+            //         if (val !== null && val !== 0) {
+            //             let $userIcon = $(".user-icon-"+key);
+            //             $userIcon.addClass('text-success');
+            //             $userIcon.attr('title','Online');
+            //         }
+            //     });
+            // });
             $chatInput.keypress(function (e) {
                 let message = $(this).html();
                 if (e.which === 13 && !e.shiftKey) {
@@ -194,19 +194,15 @@
                     return false;
                 }
             });
-
             function sendMessage(message) {
                 let url = "{{ route('message.send-group-message') }}";
                 let form = $(this);
                 let formData = new FormData();
                 let token = "{{ csrf_token() }}";
-
                 formData.append('message', message);
                 formData.append('_token', token);
                 formData.append('message_group_id', groupId);
-
                 appendMessageToSender(message);
-
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -221,82 +217,67 @@
                     }
                 });
             }
-
             function appendMessageToSender(message) {
                 let name = '{{ $myInfo->username }}';
                 let image = '{!! makeImageFromName($myInfo->username) !!}';
-
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
                     '</div>\n' +
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="' + getCurrentDateTime() + '">\n' +
-                    getCurrentTime() + '</span>\n' +
+                    '<span class="small time text-gray-500" title="'+getCurrentDateTime()+'">\n' +
+                    getCurrentTime()+'</span>\n' +
                     '</div>\n' +
                     '</div>\n';
-
                 let messageContent = '<div class="col-md-12 message-content">\n' +
                     '                            <div class="message-text">\n' + message +
                     '                            </div>\n' +
                     '                        </div>';
-
-
                 let newMessage = '<div class="row message align-items-center mb-2">'
-                    + userInfo + messageContent +
+                    +userInfo + messageContent +
                     '</div>';
-
                 $messageWrapper.append(newMessage);
             }
-
             function appendMessageToReceiver(message) {
                 let name = message.sender_name;
                 let image = '';
-
                 let userInfo = '<div class="col-md-12 user-info">\n' +
                     '<div class="chat-image">\n' + image +
                     '</div>\n' +
                     '\n' +
                     '<div class="chat-name font-weight-bold">\n' +
                     name +
-                    '<span class="small time text-gray-500" title="' + dateFormat(message.created_at) + '">\n' +
-                    timeFormat(message.created_at) + '</span>\n' +
+                    '<span class="small time text-gray-500" title="'+dateFormat(message.created_at)+'">\n' +
+                    timeFormat(message.created_at)+'</span>\n' +
                     '</div>\n' +
                     '</div>\n';
-
                 let messageContent = '<div class="col-md-12 message-content">\n' +
                     '                            <div class="message-text">\n' + message.content +
                     '                            </div>\n' +
                     '                        </div>';
-
-
                 let newMessage = '<div class="row message align-items-center mb-2">'
-                    + userInfo + messageContent +
+                    +userInfo + messageContent +
                     '</div>';
-
                 $messageWrapper.append(newMessage);
             }
-
-            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message) {
+            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message)
+            {
                 appendMessageToReceiver(message);
             });
-
-            socket.on("groupMessage", function (message) {
+            socket.on("group-channel:App\\Events\\GroupMessageEvent", function (message)
+            {
                 appendMessageToReceiver(message);
             });
-
-            socket.on("private-channel:App\\Events\\PrivateMessageEvent", function (message) {
-                location.reload();
-            });
-
             let $addGroupModal = $("#addGroupModal");
-            $(document).on("click", ".btn-add-group", function () {
-                console.log('ciao');
+            $(document).on("click", ".btn-add-group", function (){
                 $addGroupModal.modal();
             });
-
             $("#selectMember").select2();
+            socket.on("groupMessage", function (message)
+            {
+                appendMessageToReceiver(message);
+            });
         });
     </script>
 @endpush

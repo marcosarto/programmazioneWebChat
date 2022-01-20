@@ -15,6 +15,7 @@ class GroupMessageEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $data;
+
     /**
      * Create a new event instance.
      *
@@ -32,6 +33,6 @@ class GroupMessageEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('group-channel');
+        return new Channel('group-channel');
     }
 }
