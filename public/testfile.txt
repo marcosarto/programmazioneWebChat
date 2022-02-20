@@ -1,1 +1,1 @@
-{"id":302,"message_id":329,"sender_id":17,"receiver_id":1,"type":0,"seen_status":1,"deliver_status":0,"created_at":"2022-01-20T18:23:40.000000Z","updated_at":"2022-01-20T18:23:40.000000Z","message_group_id":null}
+{"id":313,"message_id":340,"sender_id":2,"receiver_id":1,"type":0,"seen_status":1,"deliver_status":0,"created_at":"2022-01-21T16:26:16.000000Z","updated_at":"2022-01-21T16:26:16.000000Z","message_group_id":null}
